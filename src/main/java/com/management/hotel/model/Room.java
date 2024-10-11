@@ -1,7 +1,6 @@
 package com.management.hotel.model;
 
 import jakarta.persistence.*;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ public class Room {
     private Long id;
     @Column(unique = true,nullable = false)
     private int number;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_type_id", referencedColumnName = "id",nullable = false)
     private RoomType roomType;
     private boolean isAvailable;

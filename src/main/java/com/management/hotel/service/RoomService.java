@@ -17,7 +17,7 @@ public class RoomService {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
 
-    public Room createRoom(int number,Long roomTypeId, Boolean isAvailable){
+    public Room createRoom(int number,Long roomTypeId, boolean isAvailable){
         Optional<RoomType> optionalRoomType = roomTypeRepository.findById(roomTypeId);
         if(optionalRoomType.isEmpty()){
             throw new IllegalArgumentException(String.format("No room type with Id: %s", roomTypeId));

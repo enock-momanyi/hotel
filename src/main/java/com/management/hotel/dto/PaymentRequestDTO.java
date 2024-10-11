@@ -5,7 +5,7 @@ import java.util.Date;
 public class PaymentRequestDTO {
     private Long bookingId;
     private Long amount;
-    private Date date;
+    private Date date = new Date();
     private String method;
 
     public Long getBookingId() {

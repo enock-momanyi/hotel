@@ -8,6 +8,7 @@ import com.management.hotel.repository.BookingRepository;
 import com.management.hotel.repository.CustomerRepository;
 import com.management.hotel.repository.PlanRepository;
 import com.management.hotel.repository.RoomRepository;
+import com.management.hotel.util.DateTimeAdjuster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +35,18 @@ public class BookingService {
         if(optionalRoom.isEmpty()){
             throw new IllegalArgumentException(String.format("Room with Id: %s does not exist", roomId));
         }
+        if(!optionalRoom.get().isAvailable()){
+            throw  new IllegalArgumentException(String.format("Room with Id: %s is not available", roomId));
+        }
         Optional<Plan> optionalPlan = planRepository.findById(planId);
         if(optionalPlan.isEmpty()){
             throw new IllegalArgumentException(String.format("Plan with id: %s does not exist", planId));
         }
-        Booking booking = new Booking(optionalCustomer.get(),optionalRoom.get(),
-                optionalPlan.get(),checkinDate,checkoutDate,amount,status);
+        Room room = optionalRoom.get();
+        room.setAvailable(false);
+        Booking booking = new Booking(optionalCustomer.get(),room,
+                optionalPlan.get(), DateTimeAdjuster.checkinDate(checkinDate),
+                DateTimeAdjuster.checkoutDate(checkoutDate),amount,status);
         return bookingRepository.save(booking);
     }
     public Booking updateBooking(Long id, Booking booking){

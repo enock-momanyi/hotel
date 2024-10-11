@@ -1,9 +1,12 @@
 package com.management.hotel.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class RoomRequestDTO {
     private int number;
     private Long roomTypeId;
-    private Boolean isAvailable;
+    @JsonProperty
+    private boolean isAvailable;
 
     public int getNumber() {
         return number;
@@ -21,11 +24,11 @@ public class RoomRequestDTO {
         this.roomTypeId = roomTypeId;
     }
 
-    public Boolean getAvailable() {
+    public boolean getAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(Boolean available) {
+    public void setAvailable(boolean available) {
         isAvailable = available;
     }
 }
