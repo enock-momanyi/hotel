@@ -3,18 +3,24 @@ package com.management.hotel.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"room_type_id", "plan_id"})
+})
 public class Pricing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="room_type_id", referencedColumnName = "id")
+    @JoinColumn(name="room_type_id", referencedColumnName = "id", nullable = false)
     private RoomType roomType;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="plan_id", referencedColumnName = "id")
+    @JoinColumn(name="plan_id", referencedColumnName = "id",nullable = false)
     private Plan plan;
     private int price;
+
+    public Pricing() {
+    }
 
     public Pricing(RoomType roomType, Plan plan, int price) {
         this.roomType = roomType;

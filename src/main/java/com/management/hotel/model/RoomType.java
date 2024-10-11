@@ -9,12 +9,17 @@ public class RoomType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true,nullable = false)
     private String name;
+    @Column(nullable = false)
     private int maxOccupancy;
-    @OneToOne(mappedBy = "room_type",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "roomType",cascade = CascadeType.ALL)
     private Pricing pricing;
-    @OneToMany(mappedBy = "room_type", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL)
     private List<Room> rooms;
+
+    public RoomType() {
+    }
 
     public RoomType(String name, int maxOccupancy) {
         this.name = name;

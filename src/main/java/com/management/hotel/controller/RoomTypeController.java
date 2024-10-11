@@ -4,10 +4,13 @@ package com.management.hotel.controller;
 import com.management.hotel.model.RoomType;
 import com.management.hotel.service.RoomTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/room_types")
@@ -24,9 +27,14 @@ public class RoomTypeController {
         return roomTypeService.getRoomType(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
     @PostMapping
-    public ResponseEntity<RoomType> createRoomType(@RequestBody RoomType roomType){
-        RoomType newRoomType = roomTypeService.createRoomType(roomType);
-        return ResponseEntity.ok(newRoomType);
+    public ResponseEntity<?> createRoomType(@RequestBody RoomType roomType){
+        try {
+            RoomType newRoomType = roomTypeService.createRoomType(roomType);
+            return ResponseEntity.ok(newRoomType);
+        }catch (DataIntegrityViolationException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Room type exists");
+        }
+
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoomType(@PathVariable Long id){

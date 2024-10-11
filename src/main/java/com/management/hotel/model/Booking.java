@@ -9,13 +9,13 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="customer_id", referencedColumnName = "id")
+    @JoinColumn(name="customer_id", referencedColumnName = "id",nullable = false)
     private Customer customer;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="room_id", referencedColumnName = "id")
+    @JoinColumn(name="room_id", referencedColumnName = "id",nullable = false)
     private Room room;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="plan_id", referencedColumnName = "id")
+    @JoinColumn(name="plan_id", referencedColumnName = "id",nullable = false)
     private Plan plan;
     private Date checkinDate;
     private Date checkoutDate;
@@ -23,6 +23,9 @@ public class Booking {
     private String status;
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     private Payment payment;
+
+    public Booking() {
+    }
 
     public Booking(Customer customer, Room room, Plan plan, Date checkinDate, Date checkoutDate, Long amount, String status) {
         this.customer = customer;

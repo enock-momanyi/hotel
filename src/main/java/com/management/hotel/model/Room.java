@@ -10,13 +10,17 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true,nullable = false)
     private int number;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "room_type_id", referencedColumnName = "id")
+    @JoinColumn(name = "room_type_id", referencedColumnName = "id",nullable = false)
     private RoomType roomType;
     private boolean isAvailable;
     @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
     private List<Booking> bookings;
+
+    public Room() {
+    }
 
     public Room(int number, RoomType roomType, boolean isAvailable) {
         this.number = number;

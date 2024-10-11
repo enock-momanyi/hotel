@@ -1,15 +1,45 @@
 package com.management.hotel.service;
 
 import com.management.hotel.model.Booking;
+import com.management.hotel.model.Customer;
+import com.management.hotel.model.Plan;
+import com.management.hotel.model.Room;
 import com.management.hotel.repository.BookingRepository;
+import com.management.hotel.repository.CustomerRepository;
+import com.management.hotel.repository.PlanRepository;
+import com.management.hotel.repository.RoomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 @Service
 public class BookingService {
+    @Autowired
     private BookingRepository bookingRepository;
-    public Booking createBooking(Booking booking){
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private RoomRepository roomRepository;
+    @Autowired
+    private PlanRepository planRepository;
+    public Booking createBooking(Long customerId, Long roomId, Long planId,
+                                 Date checkinDate, Date checkoutDate, Long amount, String status){
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if(optionalCustomer.isEmpty()){
+            throw new IllegalArgumentException(String.format("Customer with Id: %s does not exist", customerId));
+        }
+        Optional<Room> optionalRoom = roomRepository.findById(roomId);
+        if(optionalRoom.isEmpty()){
+            throw new IllegalArgumentException(String.format("Room with Id: %s does not exist", roomId));
+        }
+        Optional<Plan> optionalPlan = planRepository.findById(planId);
+        if(optionalPlan.isEmpty()){
+            throw new IllegalArgumentException(String.format("Plan with id: %s does not exist", planId));
+        }
+        Booking booking = new Booking(optionalCustomer.get(),optionalRoom.get(),
+                optionalPlan.get(),checkinDate,checkoutDate,amount,status);
         return bookingRepository.save(booking);
     }
     public Booking updateBooking(Long id, Booking booking){

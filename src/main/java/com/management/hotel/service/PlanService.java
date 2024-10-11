@@ -2,6 +2,7 @@ package com.management.hotel.service;
 
 import com.management.hotel.model.Plan;
 import com.management.hotel.repository.PlanRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Optional;
 
 @Service
 public class PlanService {
+    @Autowired
     private PlanRepository planRepository;
     public Plan createPlan(Plan plan){
         return planRepository.save(plan);

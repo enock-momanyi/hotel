@@ -3,13 +3,15 @@ package com.management.hotel.controller;
 import com.management.hotel.model.Customer;
 import com.management.hotel.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/vi/customers")
+@RequestMapping("/api/v1/customers")
 public class CustomerController {
     @Autowired
     private CustomerService customerService;
@@ -23,9 +25,14 @@ public class CustomerController {
         return customerService.getCustomer(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer){
-        Customer newCustomer = customerService.createCustomer(customer);
-        return ResponseEntity.ok(newCustomer);
+    public ResponseEntity<?> createCustomer(@RequestBody Customer customer){
+        try {
+            Customer newCustomer = customerService.createCustomer(customer);
+            return ResponseEntity.ok(newCustomer);
+        }catch (DataIntegrityViolationException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(String.format("Customer with email %s exist", customer.getEmail()));
+        }
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id){

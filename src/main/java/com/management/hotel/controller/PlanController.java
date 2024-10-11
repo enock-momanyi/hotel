@@ -3,6 +3,8 @@ package com.management.hotel.controller;
 import com.management.hotel.model.Plan;
 import com.management.hotel.service.PlanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +25,13 @@ public class PlanController {
         return planService.getPlan(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
     @PostMapping
-    public ResponseEntity<Plan> createPlan(@RequestBody Plan plan){
-        Plan newPlan = planService.createPlan(plan);
-        return ResponseEntity.ok(newPlan);
+    public ResponseEntity<?> createPlan(@RequestBody Plan plan){
+        try {
+            Plan newPlan = planService.createPlan(plan);
+            return ResponseEntity.ok(newPlan);
+        }catch (DataIntegrityViolationException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Plan name exist");
+        }
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlan(@PathVariable Long id){

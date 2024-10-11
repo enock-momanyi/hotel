@@ -9,11 +9,14 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "booking_id", referencedColumnName = "id")
+    @JoinColumn(name = "booking_id", referencedColumnName = "id",nullable = false)
     private Booking booking;
     private Long amount;
     private Date date;
     private String method;
+
+    public Payment() {
+    }
 
     public Payment(Booking booking, Long amount, Date date, String method) {
         this.booking = booking;
