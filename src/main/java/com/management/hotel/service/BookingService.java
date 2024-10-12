@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @Service
 public class BookingService {
@@ -49,15 +50,38 @@ public class BookingService {
                 DateTimeAdjuster.checkoutDate(checkoutDate),amount,status);
         return bookingRepository.save(booking);
     }
-    public Booking updateBooking(Long id, Booking booking){
+    public Booking updateBooking(Long id, Map<String, Object> bookingUpdate){
         return bookingRepository.findById(id).map(booking1 -> {
-            booking1.setAmount(booking.getAmount());
-            booking1.setCheckinDate(booking.getCheckinDate());
-            booking1.setCheckoutDate(booking.getCheckoutDate());
-            booking1.setStatus(booking.getStatus());
-            booking1.setCustomer(booking.getCustomer());
-            booking1.setPlan(booking.getPlan());
-            booking1.setRoom(booking.getRoom());
+            bookingUpdate.forEach((key, value) -> {
+                if(key.equals("amount")){
+                    booking1.setAmount((Long) value);
+                } else if (key.equals("checkinDate")) {
+                    booking1.setCheckinDate(DateTimeAdjuster.checkinDate((Date) value));
+                } else if (key.equals("checkoutDate")) {
+                    booking1.setCheckoutDate(DateTimeAdjuster.checkoutDate((Date) value));
+                } else if (key.equals("customerId") && (Long) value != booking1.getCustomer().getId()) {
+                    Optional<Customer> optionalCustomer = customerRepository.findById((Long) value);
+                    if(optionalCustomer.isEmpty()){
+                        throw new IllegalArgumentException(String.format("Customer with Id: %s does not exist", (Long) value));
+                    }
+                    booking1.setCustomer(optionalCustomer.get());
+                } else if (key.equals("planId") && (Long) value != booking1.getPlan().getId()) {
+                    Optional<Plan> optionalPlan = planRepository.findById((Long) value);
+                    if(optionalPlan.isEmpty()){
+                        throw new IllegalArgumentException(String.format("Plan with id: %s does not exist", (Long) value));
+                    }
+                    booking1.setPlan(optionalPlan.get());
+                } else if (key.equals("roomId") && (Long) value != booking1.getRoom().getId()) {
+                    Optional<Room> optionalRoom = roomRepository.findById((Long) value);
+                    if(optionalRoom.isEmpty()){
+                        throw new IllegalArgumentException(String.format("Room with Id: %s does not exist", (Long) value));
+                    }
+                    if(!optionalRoom.get().isAvailable()){
+                        throw  new IllegalArgumentException(String.format("Room with Id: %s is not available", (Long) value));
+                    }
+                    booking1.setRoom(optionalRoom.get());
+                }
+            });
             return bookingRepository.save(booking1);
         }).orElseThrow(() -> new RuntimeException("Booking not found"));
     }

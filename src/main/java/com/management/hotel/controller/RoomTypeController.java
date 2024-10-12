@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,5 +41,13 @@ public class RoomTypeController {
     public ResponseEntity<Void> deleteRoomType(@PathVariable Long id){
         roomTypeService.deleteRoomType(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateRoomType(@PathVariable Long id, @RequestBody Map<String, Object> roomTypeUpdate){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(roomTypeService.updateRoomType(id, roomTypeUpdate));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        }
     }
 }

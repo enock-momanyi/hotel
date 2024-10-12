@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
@@ -41,5 +42,13 @@ public class RoomController {
     public ResponseEntity<Void> deleteRoom(@PathVariable Long id){
         roomService.deleteRoom(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateRoom(@PathVariable Long id, @RequestBody Map<String, Object> roomUpdate){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(roomService.updateRoom(id, roomUpdate));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        }
     }
 }

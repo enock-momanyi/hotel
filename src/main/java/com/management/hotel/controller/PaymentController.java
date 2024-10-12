@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -38,5 +39,13 @@ public class PaymentController {
     public ResponseEntity<Void> deletePayment(@PathVariable Long id){
         paymentService.deletePayment(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updatePayment(@PathVariable Long id, @RequestBody Map<String, Object> paymentUpdate){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.updatePayment(id, paymentUpdate));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        }
     }
 }

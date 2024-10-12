@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -32,11 +33,25 @@ public class PricingService {
         Pricing pricing = new Pricing(optionalRoomType.get(),optionalPlan.get(),price);
         return pricingRepository.save(pricing);
     }
-    public Pricing updatePricing(Long id, Pricing pricing){
+    public Pricing updatePricing(Long id, Map<String, Object> updatedPricing){
         return pricingRepository.findById(id).map(pricing1 -> {
-            pricing1.setPrice(pricing.getPrice());
-            pricing1.setPlan(pricing.getPlan());
-            pricing1.setRoomType(pricing.getRoomType());
+            updatedPricing.forEach((key, value) -> {
+                if(key.equals("price")){
+                    pricing1.setPrice((int) value);
+                } else if (key.equals("planId") && (Long) value != pricing1.getPlan().getId()) {
+                    Optional<Plan> optionalPlan = planRepository.findById((Long) value);
+                    if(optionalPlan.isEmpty()){
+                        throw new IllegalArgumentException(String.format("No Plan with Id: %s", (Long) value));
+                    }
+                    pricing1.setPlan(optionalPlan.get());
+                } else if (key.equals("roomTypeId") && (Long) value != pricing1.getRoomType().getId()) {
+                    Optional<RoomType> optionalRoomType = roomTypeRepository.findById((Long) value);
+                    if(optionalRoomType.isEmpty()){
+                        throw new IllegalArgumentException(String.format("No Room Type with Id: %s", (Long) value));
+                    }
+                    pricing1.setRoomType(optionalRoomType.get());
+                }
+            });
             return pricingRepository.save(pricing1);
         }).orElseThrow(() -> new RuntimeException("Pricing not found"));
     }

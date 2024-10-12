@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,5 +41,13 @@ public class BookingController {
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id){
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateBooking(@PathVariable Long id, @RequestBody Map<String, Object> bookingUpdate){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.updateBooking(id, bookingUpdate));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        }
     }
 }

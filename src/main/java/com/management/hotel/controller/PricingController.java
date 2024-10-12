@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/pricings")
@@ -41,5 +42,13 @@ public class PricingController {
     public ResponseEntity<Void> deletePricing(@PathVariable Long id){
         pricingService.deletePricing(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updatePricing(@PathVariable Long id, @RequestBody Map<String, Object> pricingUpdate){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(pricingService.updatePricing(id, pricingUpdate));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        }
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -25,11 +26,21 @@ public class RoomService {
         Room room = new Room(number,optionalRoomType.get(),isAvailable);
         return roomRepository.save(room);
     }
-    public Room updateRoom(Long id, Room room){
+    public Room updateRoom(Long id, Map<String, Object> updatedRoom){
         return roomRepository.findById(id).map(room1 -> {
-            room1.setRoomType(room.getRoomType());
-            room1.setAvailable(room.isAvailable());
-            room1.setNumber(room.getNumber());
+            updatedRoom.forEach((key, value) -> {
+                if(key.equals("roomTypeId") && (Long) value != room1.getRoomType().getId()){
+                    Optional<RoomType> optionalRoomType = roomTypeRepository.findById((Long) value);
+                    if(optionalRoomType.isEmpty()){
+                        throw new IllegalArgumentException(String.format("No room type with Id: %s", (Long) value));
+                    }
+                    room1.setRoomType(optionalRoomType.get());
+                } else if (key.equals("isAvailable")) {
+                    room1.setAvailable((boolean) value);
+                } else if (key.equals("number")) {
+                    room1.setNumber((int) value);
+                }
+            });
             return roomRepository.save(room1);
         }).orElseThrow(() -> new RuntimeException("Room not found"));
     }

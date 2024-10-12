@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/plans")
@@ -37,5 +38,13 @@ public class PlanController {
     public ResponseEntity<Void> deletePlan(@PathVariable Long id){
         planService.deletePlan(id);
         return ResponseEntity.noContent().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updatePlan(@PathVariable Long id, @RequestBody Map<String, Object> planUpdate){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(planService.updatePlan(id, planUpdate));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+        }
     }
 }

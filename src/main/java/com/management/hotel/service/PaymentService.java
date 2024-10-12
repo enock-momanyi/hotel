@@ -7,9 +7,8 @@ import com.management.hotel.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 @Service
 public class PaymentService {
     @Autowired
@@ -24,12 +23,23 @@ public class PaymentService {
         Payment payment = new Payment(optionalBooking.get(),amount,date, method);
         return paymentRepository.save(payment);
     }
-    public Payment updatePayment(Long id,Payment payment){
+    public Payment updatePayment(Long id, Map<String, Object> updatePayment){
         return paymentRepository.findById(id).map(payment1 -> {
-            payment1.setAmount(payment.getAmount());
-            payment1.setDate(payment.getDate());
-            payment1.setBooking(payment.getBooking());
-            payment1.setMethod(payment.getMethod());
+            updatePayment.forEach((key, value) -> {
+                if(key.equals("amount")){
+                    payment1.setAmount((Long) value);
+                } else if (key.equals("date")) {
+                    payment1.setDate((Date) value);
+                } else if (key.equals("bookingId") && (Long) value != payment1.getBooking().getId()) {
+                    Optional<Booking> optionalBooking = bookingRepository.findById((Long) value);
+                    if(optionalBooking.isEmpty()){
+                        throw new IllegalArgumentException(String.format("Booking with Id: %s does not exist.", (Long) value));
+                    }
+                    payment1.setBooking(optionalBooking.get());
+                } else if (key.equals("method")) {
+                    payment1.setMethod((String) value);
+                }
+            });
             return paymentRepository.save(payment1);
         }).orElseThrow(() -> new RuntimeException("Payment not found"));
     }

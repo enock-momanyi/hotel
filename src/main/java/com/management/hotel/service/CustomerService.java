@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @Service
 public class CustomerService {
@@ -14,12 +15,19 @@ public class CustomerService {
     public Customer createCustomer(Customer customer){
         return customerRepository.save(customer);
     }
-    public Customer updateCustomer(Long id, Customer customer){
+    public Customer updateCustomer(Long id, Map<String, Object> customerUpdate){
         return customerRepository.findById(id).map(customer1 -> {
-            customer1.setEmail(customer.getEmail());
-            customer1.setFirstName(customer.getFirstName());
-            customer1.setLastName(customer.getLastName());
-            customer1.setPhoneNumber(customer.getPhoneNumber());
+            customerUpdate.forEach((key, value) -> {
+                if(key.equals("email")){
+                    customer1.setEmail((String) value);
+                } else if (key.equals("firstName")) {
+                    customer1.setFirstName((String) value);
+                } else if (key.equals("lastName")) {
+                    customer1.setLastName((String) value);
+                } else if (key.equals("phoneNumber")) {
+                    customer1.setPhoneNumber((String) value);
+                }
+            });
             return customerRepository.save(customer1);
         }).orElseThrow(() -> new RuntimeException("Customer not found"));
     }
